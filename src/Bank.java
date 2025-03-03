@@ -2,56 +2,106 @@ import java.util.Scanner;
 
 public class Bank {
     private double balance = 0;
-    private String name;
+    private final String name;
     private final int password;
+    Log log = new Log();
 
-    Bank(String name, double amount,int password) {
-        this.name = name;
-        this.balance = amount;
+    Bank(String name, int password, double balance) {
         this.password = password;
-        System.out.println("Account created Successfully");
+        this.name = name;
+        this.balance = balance;
     }
 
-    public void getBalance() {
-        System.out.println("Balance in " + this.name + " account is: " + this.balance);
-    }
+    public void loop() {
+        Scanner scanner = new Scanner(System.in);
+        int option;
+        double amount;
+        do {
+            System.out.println("*********************");
+            System.out.println("Welcome to Java Bank");
+            System.out.println("*********************");
+            System.out.println("Enter a option: ");
+            System.out.println("*********************");
+            System.out.println("1. getBalance");
+            System.out.println("2. Deposit amount");
+            System.out.println("3. withdraw amount");
+            System.out.println("4. Exit from interface");
+            System.out.println("*********************");
+            System.out.print("Choose an option : ");
+            option = scanner.nextInt();
 
-    public void addAmount(double amount, int password) {
-        if (checkPassword(password)) {
-            if (amount <= 0) {
-                System.out.println("Enter a number greater than 0");
-                System.out.println("Failed to add amount");
-                return;
-            } else {
-                this.balance += amount;
-                System.out.println("Successfully added the balance");
-                this.getBalance();
+            switch (option) {
+                case 1 -> {
+                    System.out.println("Your Current Balance is : " + log.getBalance(this.name));
+                }
+                case 2 -> {
+                    System.out.print("\nEnter the amount to deposit: ");
+                    amount = scanner.nextDouble();
+                    scanner.nextLine();
+                    System.out.print("To perform the operation enter your password: ");
+                    int userEnteredPassword = scanner.nextInt();
+                    if (userEnteredPassword == this.password) {
+                        this.addAmount(amount);
+                    } else {
+                        System.out.println("Wrong Password");
+                    }
+                }
+                case 3 -> {
+                    System.out.print("\nEnter the amount to withdraw: ");
+                    amount = scanner.nextDouble();
+                    scanner.nextLine();
+                    System.out.print("To perform the operation enter your password: ");
+                    int userEnteredPassword = scanner.nextInt();
+                    if (userEnteredPassword == this.password) {
+                        this.withdrawAmount(amount);
+                    } else {
+                        System.out.println("Wrong Password");
+                    }
+
+                }
+                case 4 -> {
+                    System.out.println("Saving to database");
+                    if (log.writeToDataBase(this.name, this.password, this.balance) == 200) {
+                        System.out.println("Updated the database");
+                    }
+                    System.out.println("Thank you for visiting our bank");
+                }
+                default -> System.out.println("Invalid option");
             }
-        }
-        else{
-            System.out.println("Password does not match");
-        }
+        } while (option != 4);
+        scanner.close();
     }
 
-    public void withdrawAmount(double amount, int password) {
-        if (checkPassword(password)) {
-            if (balance < amount) {
-                System.out.println("Insufficient Balance");
-                return;
-            } else {
-                balance -= amount;
-                System.out.println(amount + " has been withdrawn from " + this.name + " account");
-                getBalance();
-            }
+    public void addAmount(double amount) {
+        if (amount <= 0) {
+            System.out.println("Enter a number greater than 0");
+            System.out.println("Failed to add amount");
         } else {
-            System.out.println("Password does not match");
+            this.balance += amount;
+            String message = amount + " has been deposited to " + this.name + " account";
+            log.writeToDataBase(this.name, this.password, this.balance);
+            if (log.writeQuery(this.name, message, this.balance) == 200) {
+                System.out.println("Entering into the logs");
+                System.out.println(message);
+            } else {
+                System.out.println("Couldn't enter the transaction into the logs");
+            }
         }
     }
 
-    private Boolean checkPassword(int password) {
-        if (this.password == 0) {
-            return false;
+    public void withdrawAmount(double amount) {
+        if (balance < amount) {
+            System.out.println("Insufficient Balance");
+        } else {
+            balance -= amount;
+            String message = amount + " has been withdrawn from " + this.name + " account";
+            log.writeToDataBase(this.name, this.password, this.balance);
+            if (log.writeQuery(this.name, message, this.balance) == 200) {
+                System.out.println("Entering into the logs");
+                System.out.println(message);
+            } else {
+                System.out.println("Couldn't enter the transaction into the logs");
+            }
         }
-        return this.password == password;
     }
 }
