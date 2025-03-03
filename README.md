@@ -32,12 +32,12 @@ This Java Bank Program is designed to manage bank accounts with features such as
 ## Usage
 1. **Compile the program**:
     ```bash
-    javac -cp .;gson-2.8.6.jar Main.java
+    javac -cp .gson-2.8.6.jar Main.java;
     ```
 
 2. **Run the program**:
     ```bash
-    java -cp .;gson-2.8.6.jar Main
+    java -cp .gson-2.8.6.jar Main;
     ```
 
 ## Configuration
